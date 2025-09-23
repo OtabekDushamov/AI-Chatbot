@@ -93,7 +93,7 @@
         .message-bubble {
             max-width: 80%;
             padding: 0.75rem 1rem;
-            border-radius: 1rem;
+            border-radius: 0 1rem 1rem 1rem;
             line-height: 1.5;
             position: relative;
             word-wrap: break-word;
@@ -121,16 +121,17 @@
             width: 10px;
             height: 20px;
             background-color: var(--ai-bubble);
-            clip-path: polygon(0 0, 100% 0, 100% 100%);
+            clip-path: polygon(0 0, 100% 100%, 100% 0);
         }
 
         .user-message .message-bubble::after {
             content: '';
             position: absolute;
-            right: -5px;
+            right: -7px;
             top: 0;
             width: 10px;
             height: 20px;
+            border-radius: 1rem 0 1rem 1rem;
             background-color: var(--user-bubble);
             clip-path: polygon(0 0, 0 100%, 100% 0);
         }
@@ -340,6 +341,14 @@
             const typingIndicator = document.getElementById('typingIndicator');
             const fileUploadButton = document.getElementById('fileUploadButton');
             const welcomeTime = document.getElementById('welcomeTime');
+            const sendIcon = sendButton.querySelector('i');
+            const SYSTEM_PROMPT = (
+                'You are Nexus, a concise and helpful assistant. ' +
+                'Format replies for readability:\n' +
+                '- Use short paragraphs separated by a blank line.\n' +
+                '- Use markdown for lists and code fences for code.\n' +
+                '- Avoid trailing spaces and excessive verbosity.\n'
+            );
 
             // Set welcome message time
             const now = new Date();
@@ -347,22 +356,46 @@
             welcomeTime.textContent = `Today, ${timeString}`;
 
             // Function to add a new message to the chat
-            function addMessage(text, isUser) {
+            function addMessage(text, isUser, isLoading = false) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
                 
                 const now = new Date();
                 const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 
+                let contentHtml;
+                if (isLoading) {
+                    contentHtml = `
+                        <div class="typing-indicator" style="display: flex; margin: 0;">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    `;
+                } else {
+                    contentHtml = isUser ? `<p>${escapeHtml(text)}</p>` : renderAssistantHtml(text);
+                }
+                
                 messageDiv.innerHTML = `
                     <div class="message-bubble">
-                        <p>${escapeHtml(text)}</p>
+                        ${contentHtml}
                         <div class="message-time">Today, ${timeString}</div>
                     </div>
                 `;
                 
                 chatMessages.appendChild(messageDiv);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+                return messageDiv;
+            }
+
+            function renderAssistantHtml(text) {
+                // Escape first, then convert to paragraphs and line breaks
+                const escaped = escapeHtml(text);
+                // Split by blank lines for paragraphs
+                const paragraphs = escaped.split(/\n{2,}/).map(part => {
+                    return '<p>' + part.replace(/\n/g, '<br>') + '</p>';
+                });
+                return paragraphs.join('');
             }
 
             // Function to escape HTML
@@ -378,11 +411,15 @@
                 
                 messageElements.forEach(element => {
                     const isUser = element.classList.contains('user-message');
-                    const text = element.querySelector('.message-bubble p').textContent;
-                    messages.push({
-                        role: isUser ? 'user' : 'assistant',
-                        content: text
-                    });
+                    const textElement = element.querySelector('.message-bubble p');
+                    
+                    // Skip loading messages (they don't have text content)
+                    if (textElement && textElement.textContent) {
+                        messages.push({
+                            role: isUser ? 'user' : 'assistant',
+                            content: textElement.textContent
+                        });
+                    }
                 });
                 
                 return messages;
@@ -391,6 +428,8 @@
             // Function to send message to backend
             async function sendToBackend(userMessage) {
                 const messages = collectMessages();
+                // Inject a system prompt once per request (first element)
+                const payloadMessages = [{ role: 'system', content: SYSTEM_PROMPT }, ...messages];
                 
                 try {
                     const response = await fetch('/api/chat/', {
@@ -399,7 +438,7 @@
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            messages: messages,
+                            messages: payloadMessages,
                             model: 'gpt-4o-mini',
                             temperature: 0.7
                         })
@@ -423,14 +462,6 @@
             }
 
             // Function to simulate AI typing
-            function showTyping() {
-                typingIndicator.style.display = 'flex';
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-
-            function hideTyping() {
-                typingIndicator.style.display = 'none';
-            }
 
             // Handle send button click
             sendButton.addEventListener('click', async function() {
@@ -440,14 +471,17 @@
                     messageInput.value = '';
                     sendButton.disabled = true;
                     
-                    showTyping();
+                    // Add loading message for AI response
+                    const loadingMessage = addMessage('', false, true);
                     
                     try {
                         const aiResponse = await sendToBackend(message);
-                        hideTyping();
+                        // Replace loading message with actual response
+                        loadingMessage.remove();
                         addMessage(aiResponse, false);
                     } catch (error) {
-                        hideTyping();
+                        // Replace loading message with error
+                        loadingMessage.remove();
                         addMessage(`Error: ${error.message}`, false);
                     } finally {
                         sendButton.disabled = false;
