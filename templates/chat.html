@@ -102,7 +102,7 @@
         .user-message .message-bubble {
             background-color: var(--user-bubble);
             color: white;
-            border-bottom-right-radius: 0.25rem;
+            border-radius: 1rem 0 1rem 1rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
@@ -116,7 +116,7 @@
         .ai-message .message-bubble::before {
             content: '';
             position: absolute;
-            left: -5px;
+            left: -7px;
             top: 0;
             width: 10px;
             height: 20px;
@@ -131,7 +131,6 @@
             top: 0;
             width: 10px;
             height: 20px;
-            border-radius: 1rem 0 1rem 1rem;
             background-color: var(--user-bubble);
             clip-path: polygon(0 0, 0 100%, 100% 0);
         }
