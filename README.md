@@ -4,7 +4,8 @@ Lightweight ChatGPT-style web chat built with Django that connects to the OpenAI
 
 ## Features
 
-- ChatGPT-like interface (Tailwind UI) at `/`
+- Modes landing page at `/` to choose specialized assistants
+- ChatGPT-like interface (Tailwind UI) at `/chat/`
 - Backend proxy to OpenAI (no API key in the browser)
 - Conversation context (messages array) per request
 - Configurable model and temperature
@@ -40,12 +41,14 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-Open `http://127.0.0.1:8000/` to use the chat UI.
+Open `http://127.0.0.1:8000/` to select a mode, then you will be redirected to `/chat/` with the chosen assistant.
 
 ## Endpoints
 
-- `GET /` → Renders the chat UI (`templates/chat.html`).
+- `GET /` → Renders modes selector (`templates/modes.html`).
+- `GET /chat/` → Renders the chat UI (`templates/chat.html`).
 - `POST /api/chat/` → Forwards the conversation to OpenAI and returns the assistant reply.
+- `GET /api/modes/` → Returns the modes/assistants catalog.
 
 Request body (example):
 
@@ -54,6 +57,7 @@ Request body (example):
   "messages": [
     {"role": "user", "content": "Hello!"}
   ],
+  "assistant_id": "teacher_tutor",
   "model": "gpt-4o-mini",
   "temperature": 0.7
 }

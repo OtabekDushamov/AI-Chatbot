@@ -299,14 +299,20 @@
             <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                 <i class="fas fa-robot text-white text-sm"></i>
             </div>
-            <h1>Nexus AI Assistant</h1>
+            <h1 id="assistantName">Nexus AI Assistant</h1>
+        </div>
+
+        <!-- Mode tabs and submodes -->
+        <div id="modeSwitcher" class="px-4 py-3 border-b border-white/10">
+            <div id="modeTabs" class="flex items-center gap-0 w-full"></div>
+            <div id="subModes" class="mt-3 flex items-center gap-2 overflow-x-auto"></div>
         </div>
 
         <div class="chat-messages" id="chatMessages">
             <!-- AI welcome message -->
             <div class="message ai-message">
                 <div class="message-bubble">
-                    <p>Hello! I'm Nexus, your AI assistant. How can I help you today?</p>
+                    <p id="welcomeMessage">Hello! I'm Nexus, your AI assistant. How can I help you today?</p>
                     <div class="message-time" id="welcomeTime"></div>
                 </div>
             </div>
@@ -341,18 +347,137 @@
             const fileUploadButton = document.getElementById('fileUploadButton');
             const welcomeTime = document.getElementById('welcomeTime');
             const sendIcon = sendButton.querySelector('i');
-            const SYSTEM_PROMPT = (
-                'You are Nexus, a concise and helpful assistant. ' +
-                'Format replies for readability:\n' +
-                '- Use short paragraphs separated by a blank line.\n' +
-                '- Use markdown for lists and code fences for code.\n' +
-                '- Avoid trailing spaces and excessive verbosity.\n'
-            );
+            const assistantNameEl = document.getElementById('assistantName');
+            const welcomeMessageEl = document.getElementById('welcomeMessage');
+            const modeTabs = document.getElementById('modeTabs');
+            const subModes = document.getElementById('subModes');
+
+            const ASSISTANT_NAME_BY_ID = {
+                'teacher_tutor': 'AI Teacher/Tutor',
+                'research_assistant': 'AI Research Assistant',
+                'business_consultant': 'AI Business Consultant',
+                'programmer_support': 'AI Programmer/Tech Support',
+                'writer_editor': 'AI Writer/Editor',
+                'psychologist_coach': 'AI Psychologist/Wellness Coach',
+                'fitness_nutrition': 'AI Fitness/Nutrition Coach',
+                'financial_advisor': 'AI Financial Advisor',
+                'career_coach': 'AI Career Coach',
+                'language_partner': 'AI Language Partner',
+                'poet_storyteller': 'AI Poet/Storyteller',
+                'designer': 'AI Designer',
+                'musician': 'AI Musician',
+                'game_master': 'AI Game Master'
+            };
+
+            function getAssistantIdFromUrl() {
+                const params = new URLSearchParams(window.location.search);
+                return params.get('assistant_id');
+            }
+
+            // Check if assistant is selected, redirect to main page if not
+            const currentAssistantId = getAssistantIdFromUrl();
+            if (!currentAssistantId || !ASSISTANT_NAME_BY_ID[currentAssistantId]) {
+                window.location.href = '/';
+                return;
+            }
+
+            // Set assistant name in header
+            assistantNameEl.textContent = ASSISTANT_NAME_BY_ID[currentAssistantId];
+
+            // Set custom welcome message
+            const assistantName = ASSISTANT_NAME_BY_ID[currentAssistantId];
+            welcomeMessageEl.textContent = `Hello! I'm ${assistantName}. How can I help you today?`;
 
             // Set welcome message time
             const now = new Date();
             const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             welcomeTime.textContent = `Today, ${timeString}`;
+
+            // Build tabbed mode switcher
+            async function loadModes() {
+                try {
+                    const res = await fetch('/api/modes/');
+                    if (!res.ok) throw new Error('Failed to load modes');
+                    const data = await res.json();
+                    const modes = data.modes || {};
+
+                    const modeOrder = ['professional', 'personal', 'creative'];
+                    const items = modeOrder
+                        .filter(k => modes[k])
+                        .map(k => ({ key: k, name: modes[k].name, assistants: modes[k].assistants || [] }));
+
+                    // Determine active mode by current assistant
+                    function getModeByAssistant(aid) {
+                        for (const it of items) {
+                            if (it.assistants.find(a => a.id === aid)) return it.key;
+                        }
+                        return items[0]?.key;
+                    }
+
+                    let activeModeKey = getModeByAssistant(currentAssistantId);
+
+                    const MODE_ICONS = {
+                        professional: 'fa-graduation-cap',
+                        personal: 'fa-user',
+                        creative: 'fa-palette'
+                    };
+
+                    function renderTabs() {
+                        modeTabs.innerHTML = items.map(it => {
+                            const active = it.key === activeModeKey;
+                            const base = 'flex-1 text-center px-3 py-2 border-b-2';
+                            const classes = active ? 'border-indigo-500 text-white bg-white/10' : 'border-transparent text-gray-300 hover:bg-white/5 hover:text-white';
+                            const icon = MODE_ICONS[it.key] || 'fa-circle';
+                            return `
+                                <button data-mode="${it.key}" class="${base} ${classes}">
+                                    <span class="inline-flex items-center justify-center gap-2">
+                                        <i class="fas ${icon}"></i>
+                                        <span>${it.name}</span>
+                                    </span>
+                                </button>
+                            `;
+                        }).join('');
+
+                        Array.from(modeTabs.querySelectorAll('button')).forEach(btn => {
+                            btn.addEventListener('click', () => {
+                                activeModeKey = btn.getAttribute('data-mode');
+                                renderTabs();
+                                renderSubModes();
+                            });
+                        });
+                    }
+
+                    function renderSubModes() {
+                        const active = items.find(it => it.key === activeModeKey);
+                        if (!active) return;
+                        subModes.innerHTML = (active.assistants).map(a => {
+                            const isActive = a.id === currentAssistantId;
+                            const classes = isActive ? 'border-indigo-400 text-white' : 'border-white/20 text-gray-200 hover:border-indigo-300 hover:text-white';
+                            return `
+                                <button data-id="${a.id}" title="${a.name}" class="px-3 py-1.5 rounded-full border text-sm ${classes}">${a.name}</button>
+                            `;
+                        }).join('');
+
+                        Array.from(subModes.querySelectorAll('button')).forEach(btn => {
+                            btn.addEventListener('click', () => {
+                                const newId = btn.getAttribute('data-id');
+                                if (newId && newId !== currentAssistantId) {
+                                    const url = new URL(window.location.origin + '/chat/');
+                                    url.searchParams.set('assistant_id', newId);
+                                    window.location.href = url.toString();
+                                }
+                            });
+                        });
+                    }
+
+                    renderTabs();
+                    renderSubModes();
+                } catch (e) {
+                    modeTabs.innerHTML = '<span class="text-sm text-red-300">Failed to load modes</span>';
+                }
+            }
+
+            loadModes();
 
             // Function to add a new message to the chat
             function addMessage(text, isUser, isLoading = false) {
@@ -388,13 +513,32 @@
             }
 
             function renderAssistantHtml(text) {
-                // Escape first, then convert to paragraphs and line breaks
-                const escaped = escapeHtml(text);
-                // Split by blank lines for paragraphs
-                const paragraphs = escaped.split(/\n{2,}/).map(part => {
-                    return '<p>' + part.replace(/\n/g, '<br>') + '</p>';
+                // Escape to avoid HTML injection first
+                let escaped = escapeHtml(text);
+
+                // Convert markdown bold **text** to <strong>
+                escaped = escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1<\/strong>');
+
+                // Convert lines starting with ### to headings
+                escaped = escaped
+                    .split('\n')
+                    .map(line => {
+                        if (/^###\s+/.test(line)) {
+                            const title = line.replace(/^###\s+/, '');
+                            return `<h3 class="text-lg font-semibold mb-2">${title}<\/h3>`;
+                        }
+                        return line;
+                    })
+                    .join('\n');
+
+                // Split by blank lines into blocks; wrap non-heading blocks in <p>
+                const blocks = escaped.split(/\n{2,}/).map(block => {
+                    if (/^<h3[\s\S]*><\/h3>$/.test(block.trim())) {
+                        return block; // already a heading block
+                    }
+                    return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
                 });
-                return paragraphs.join('');
+                return blocks.join('');
             }
 
             // Function to escape HTML
@@ -427,8 +571,7 @@
             // Function to send message to backend
             async function sendToBackend(userMessage) {
                 const messages = collectMessages();
-                // Inject a system prompt once per request (first element)
-                const payloadMessages = [{ role: 'system', content: SYSTEM_PROMPT }, ...messages];
+                const assistantId = getAssistantIdFromUrl();
                 
                 try {
                     const response = await fetch('/api/chat/', {
@@ -437,7 +580,8 @@
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            messages: payloadMessages,
+                            messages: messages,
+                            assistant_id: assistantId || undefined,
                             model: 'gpt-4o-mini',
                             temperature: 0.7
                         })
