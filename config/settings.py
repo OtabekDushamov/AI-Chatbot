@@ -127,3 +127,15 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# OpenAI Configuration
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
+
+# Assistant API Configuration
+OPENAI_ASSISTANT_MODEL = os.getenv('OPENAI_ASSISTANT_MODEL', 'gpt-4o-mini')
+OPENAI_ASSISTANT_INSTRUCTIONS = os.getenv('OPENAI_ASSISTANT_INSTRUCTIONS', 
+    'You are a helpful AI assistant. Provide clear, accurate, and helpful responses. '
+    'Use markdown formatting for better readability with clear structure: use ### for main sections, '
+    '**bold** for key terms, bullet points for lists, and fenced code blocks for code examples. '
+    'Keep paragraphs short and separated by blank lines for readability.')

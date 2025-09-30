@@ -299,7 +299,7 @@
             <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                 <i class="fas fa-robot text-white text-sm"></i>
             </div>
-            <h1 id="assistantName">Nexus AI Assistant</h1>
+            <h1 id="assistantName">{{ assistant.name }}</h1>
         </div>
 
         <!-- Mode tabs and submodes -->
@@ -309,13 +309,28 @@
         </div>
 
         <div class="chat-messages" id="chatMessages">
-            <!-- AI welcome message -->
-            <div class="message ai-message">
-                <div class="message-bubble">
-                    <p id="welcomeMessage">Hello! I'm Nexus, your AI assistant. How can I help you today?</p>
-                    <div class="message-time" id="welcomeTime"></div>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="message {% if message.role == 'user' %}user-message{% else %}ai-message{% endif %}">
+                        <div class="message-bubble">
+                            {% if message.role == 'user' %}
+                                <p>{{ message.content|escape }}</p>
+                            {% else %}
+                                <div class="assistant-message-content">{{ message.content|safe }}</div>
+                            {% endif %}
+                            <div class="message-time">{{ message.created_at|date:"M d, H:i" }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <!-- AI welcome message -->
+                <div class="message ai-message">
+                    <div class="message-bubble">
+                        <p id="welcomeMessage">Hello! I'm {{ assistant.name }}, your AI assistant. How can I help you today?</p>
+                        <div class="message-time" id="welcomeTime"></div>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
 
             <!-- Typing indicator (hidden by default) -->
             <div class="typing-indicator" id="typingIndicator" style="display: none;">
@@ -369,29 +384,21 @@
                 'game_master': 'AI Game Master'
             };
 
-            function getAssistantIdFromUrl() {
-                const params = new URLSearchParams(window.location.search);
-                return params.get('assistant_id');
+            // Get chat ID from URL
+            function getChatIdFromUrl() {
+                const pathParts = window.location.pathname.split('/');
+                return pathParts[pathParts.length - 2]; // chat/<id>/
             }
 
-            // Check if assistant is selected, redirect to main page if not
-            const currentAssistantId = getAssistantIdFromUrl();
-            if (!currentAssistantId || !ASSISTANT_NAME_BY_ID[currentAssistantId]) {
+            // Get current chat ID
+            const currentChatId = getChatIdFromUrl();
+            if (!currentChatId || isNaN(currentChatId)) {
                 window.location.href = '/';
                 return;
             }
 
-            // Set assistant name in header
-            assistantNameEl.textContent = ASSISTANT_NAME_BY_ID[currentAssistantId];
-
-            // Set custom welcome message
-            const assistantName = ASSISTANT_NAME_BY_ID[currentAssistantId];
-            welcomeMessageEl.textContent = `Hello! I'm ${assistantName}. How can I help you today?`;
-
-            // Set welcome message time
-            const now = new Date();
-            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            welcomeTime.textContent = `Today, ${timeString}`;
+            // Set assistant name in header (already set by template)
+            const assistantName = assistantNameEl.textContent;
 
             // Build tabbed mode switcher
             async function loadModes() {
@@ -414,6 +421,8 @@
                         return items[0]?.key;
                     }
 
+                    // Get current assistant ID from the page
+                    const currentAssistantId = '{{ assistant.assistant_id }}';
                     let activeModeKey = getModeByAssistant(currentAssistantId);
 
                     const MODE_ICONS = {
@@ -462,7 +471,7 @@
                             btn.addEventListener('click', () => {
                                 const newId = btn.getAttribute('data-id');
                                 if (newId && newId !== currentAssistantId) {
-                                    const url = new URL(window.location.origin + '/chat/');
+                                    const url = new URL(window.location.origin + '/chat/create/');
                                     url.searchParams.set('assistant_id', newId);
                                     window.location.href = url.toString();
                                 }
@@ -525,7 +534,7 @@
                     .map(line => {
                         if (/^###\s+/.test(line)) {
                             const title = line.replace(/^###\s+/, '');
-                            return `<h3 class="text-lg font-semibold mb-2">${title}<\/h3>`;
+                            return `<h3 class="text-lg font-semibold mt-4">${title}<\/h3>`;
                         }
                         return line;
                     })
@@ -536,7 +545,8 @@
                     if (/^<h3[\s\S]*><\/h3>$/.test(block.trim())) {
                         return block; // already a heading block
                     }
-                    return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
+                    return '<p>' + block + '</p>';
+                    // return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
                 });
                 return blocks.join('');
             }
@@ -547,32 +557,8 @@
                 return String(text).replace(/[&<>"']/g, m => map[m]);
             }
 
-            // Function to collect all messages for API
-            function collectMessages() {
-                const messages = [];
-                const messageElements = chatMessages.querySelectorAll('.message');
-                
-                messageElements.forEach(element => {
-                    const isUser = element.classList.contains('user-message');
-                    const textElement = element.querySelector('.message-bubble p');
-                    
-                    // Skip loading messages (they don't have text content)
-                    if (textElement && textElement.textContent) {
-                        messages.push({
-                            role: isUser ? 'user' : 'assistant',
-                            content: textElement.textContent
-                        });
-                    }
-                });
-                
-                return messages;
-            }
-
             // Function to send message to backend
             async function sendToBackend(userMessage) {
-                const messages = collectMessages();
-                const assistantId = getAssistantIdFromUrl();
-                
                 try {
                     const response = await fetch('/api/chat/', {
                         method: 'POST',
@@ -580,10 +566,8 @@
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            messages: messages,
-                            assistant_id: assistantId || undefined,
-                            model: 'gpt-4o-mini',
-                            temperature: 0.7
+                            message: userMessage,
+                            chat_id: currentChatId
                         })
                     });
 
@@ -645,6 +629,19 @@
                 // In a real implementation, this would open a file dialog
                 alert('File upload functionality would be implemented here');
             });
+
+            // Process existing assistant messages with renderAssistantHtml
+            function processExistingMessages() {
+                const assistantMessages = document.querySelectorAll('.assistant-message-content');
+                assistantMessages.forEach(element => {
+                    const originalContent = element.textContent;
+                    const processedContent = renderAssistantHtml(originalContent);
+                    element.innerHTML = processedContent;
+                });
+            }
+
+            // Process existing messages on page load
+            processExistingMessages();
 
             // Focus the input field on page load
             messageInput.focus();

@@ -127,7 +127,7 @@
 
     <script>
         function selectAssistant(id) {
-            const url = new URL(window.location.origin + '/chat/');
+            const url = new URL(window.location.origin + '/chat/create/');
             url.searchParams.set('assistant_id', id);
             window.location.href = url.toString();
         }
