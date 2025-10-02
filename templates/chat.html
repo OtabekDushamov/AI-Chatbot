@@ -532,6 +532,10 @@
                 escaped = escaped
                     .split('\n')
                     .map(line => {
+                        if (/^####\s+/.test(line)) {
+                            const title = line.replace(/^####\s+/, '');
+                            return `<h3 class="text-lg font-semibold mt-4">${title}<\/h3>`;
+                        }
                         if (/^###\s+/.test(line)) {
                             const title = line.replace(/^###\s+/, '');
                             return `<h3 class="text-lg font-semibold mt-4">${title}<\/h3>`;
