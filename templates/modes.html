@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot Mode Selector</title>
@@ -45,24 +46,49 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div onclick="selectAssistant('teacher_tutor')" class="card-hover relative bg-gray-800 rounded-xl p-6 border border-transparent bg-gradient-to-br from-gray-800 to-gray-900 hover:border-blue-500/30 transition-all duration-300 cursor-pointer">
-                        <h3 class="text-xl font-semibold mb-2">AI Teacher/Tutor</h3>
-                        <p class="text-gray-400">Explains concepts (math, science, history, languages).</p>
+                        <div class="flex items-center gap-4">
+                            <img src="{% static 'img/AI Teacher.png' %}" alt="AI Teacher/Tutor" class="w-20 h-20 object-cover rounded-lg ml-auto">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold mb-1">AI Teacher/Tutor</h3>
+                                <p class="text-gray-400">Explains concepts (math, science, history, languages).</p>
+                            </div>
+                        </div>
                     </div>
                     <div onclick="selectAssistant('research_assistant')" class="card-hover relative bg-gray-800 rounded-xl p-6 border border-transparent bg-gradient-to-br from-gray-800 to-gray-900 hover:border-blue-500/30 transition-all duration-300 cursor-pointer">
-                        <h3 class="text-xl font-semibold mb-2">AI Research Assistant</h3>
-                        <p class="text-gray-400">Summarizes articles, finds key insights, compares sources.</p>
+                        <div class="flex items-center gap-4">
+                            <img src="{% static 'img/AI Research Assistant.png' %}" alt="AI Research Assistant" class="w-20 h-20 object-cover rounded-lg ml-auto">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold mb-1">AI Research Assistant</h3>
+                                <p class="text-gray-400">Summarizes articles, finds key insights, compares sources.</p>
+                            </div>
+                        </div>
                     </div>
                     <div onclick="selectAssistant('business_consultant')" class="card-hover relative bg-gray-800 rounded-xl p-6 border border-transparent bg-gradient-to-br from-gray-800 to-gray-900 hover:border-blue-500/30 transition-all duration-300 cursor-pointer">
-                        <h3 class="text-xl font-semibold mb-2">AI Business Consultant</h3>
-                        <p class="text-gray-400">Gives advice on strategy, operations, marketing.</p>
+                        <div class="flex items-center gap-4">
+                            <img src="{% static 'img/AI Business Consultant.png' %}" alt="AI Business Consultant" class="w-20 h-20 object-cover rounded-lg ml-auto">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold mb-1">AI Business Consultant</h3>
+                                <p class="text-gray-400">Gives advice on strategy, operations, marketing.</p>
+                            </div>
+                        </div>
                     </div>
                     <div onclick="selectAssistant('programmer_support')" class="card-hover relative bg-gray-800 rounded-xl p-6 border border-transparent bg-gradient-to-br from-gray-800 to-gray-900 hover:border-blue-500/30 transition-all duration-300 cursor-pointer">
-                        <h3 class="text-xl font-semibold mb-2">AI Programmer/Tech Support</h3>
-                        <p class="text-gray-400">Helps debug code, explain errors, write snippets.</p>
+                        <div class="flex items-center gap-4">
+                            <img src="{% static 'img/AI Programmer.png' %}" alt="AI Programmer/Tech Support" class="w-20 h-20 object-cover rounded-lg ml-auto">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold mb-1">AI Programmer/Tech Support</h3>
+                                <p class="text-gray-400">Helps debug code, explain errors, write snippets.</p>
+                            </div>
+                        </div>
                     </div>
                     <div onclick="selectAssistant('writer_editor')" class="card-hover relative bg-gray-800 rounded-xl p-6 border border-transparent bg-gradient-to-br from-gray-800 to-gray-900 hover:border-blue-500/30 transition-all duration-300 cursor-pointer">
-                        <h3 class="text-xl font-semibold mb-2">AI Writer/Editor</h3>
-                        <p class="text-gray-400">Proofreads text, improves clarity, adapts style.</p>
+                        <div class="flex items-center gap-4">
+                            <img src="{% static 'img/AI Writer.png' %}" alt="AI Writer/Editor" class="w-20 h-20 object-cover rounded-lg ml-auto">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold mb-1">AI Writer/Editor</h3>
+                                <p class="text-gray-400">Proofreads text, improves clarity, adapts style.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -75,24 +101,49 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div onclick="selectAssistant('psychologist_coach')" class="card-hover relative bg-gray-800 rounded-xl p-6 border border-transparent bg-gradient-to-br from-gray-800 to-gray-900 hover:border-blue-500/30 transition-all duration-300 cursor-pointer">
-                        <h3 class="text-xl font-semibold mb-2">AI Psychologist/Wellness Coach</h3>
-                        <p class="text-gray-400">Mental health support & journaling (not medical diagnosis).</p>
+                        <div class="flex items-center gap-4">
+                            <img src="{% static 'img/AI Psychologist.png' %}" alt="AI Psychologist/Wellness Coach" class="w-20 h-20 object-cover rounded-lg ml-auto">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold mb-1">AI Psychologist/Wellness Coach</h3>
+                                <p class="text-gray-400">Mental health support & journaling (not medical diagnosis).</p>
+                            </div>
+                        </div>
                     </div>
                     <div onclick="selectAssistant('fitness_nutrition')" class="card-hover relative bg-gray-800 rounded-xl p-6 border border-transparent bg-gradient-to-br from-gray-800 to-gray-900 hover:border-blue-500/30 transition-all duration-300 cursor-pointer">
-                        <h3 class="text-xl font-semibold mb-2">AI Fitness/Nutrition Coach</h3>
-                        <p class="text-gray-400">Workout and diet suggestions.</p>
+                        <div class="flex items-center gap-4">
+                            <img src="{% static 'img/AI Fitness.png' %}" alt="AI Fitness/Nutrition Coach" class="w-20 h-20 object-cover rounded-lg ml-auto">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold mb-1">AI Fitness/Nutrition Coach</h3>
+                                <p class="text-gray-400">Workout and diet suggestions.</p>
+                            </div>
+                        </div>
                     </div>
                     <div onclick="selectAssistant('financial_advisor')" class="card-hover relative bg-gray-800 rounded-xl p-6 border border-transparent bg-gradient-to-br from-gray-800 to-gray-900 hover:border-blue-500/30 transition-all duration-300 cursor-pointer">
-                        <h3 class="text-xl font-semibold mb-2">AI Financial Advisor</h3>
-                        <p class="text-gray-400">Budgeting, investment basics, expense tracking.</p>
+                        <div class="flex items-center gap-4">
+                            <img src="{% static 'img/AI Financial Advisor.png' %}" alt="AI Financial Advisor" class="w-20 h-20 object-cover rounded-lg ml-auto">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold mb-1">AI Financial Advisor</h3>
+                                <p class="text-gray-400">Budgeting, investment basics, expense tracking.</p>
+                            </div>
+                        </div>
                     </div>
                     <div onclick="selectAssistant('career_coach')" class="card-hover relative bg-gray-800 rounded-xl p-6 border border-transparent bg-gradient-to-br from-gray-800 to-gray-900 hover:border-blue-500/30 transition-all duration-300 cursor-pointer">
-                        <h3 class="text-xl font-semibold mb-2">AI Career Coach</h3>
-                        <p class="text-gray-400">Resume tips, interview prep, career guidance.</p>
+                        <div class="flex items-center gap-4">
+                            <img src="{% static 'img/AI Career Coach.png' %}" alt="AI Career Coach" class="w-20 h-20 object-cover rounded-lg ml-auto">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold mb-1">AI Career Coach</h3>
+                                <p class="text-gray-400">Resume tips, interview prep, career guidance.</p>
+                            </div>
+                        </div>
                     </div>
                     <div onclick="selectAssistant('language_partner')" class="card-hover relative bg-gray-800 rounded-xl p-6 border border-transparent bg-gradient-to-br from-gray-800 to-gray-900 hover:border-blue-500/30 transition-all duration-300 cursor-pointer">
-                        <h3 class="text-xl font-semibold mb-2">AI Language Partner</h3>
-                        <p class="text-gray-400">Conversation practice in different languages.</p>
+                        <div class="flex items-center gap-4">
+                            <img src="{% static 'img/AI Language Partner.png' %}" alt="AI Language Partner" class="w-20 h-20 object-cover rounded-lg ml-auto">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold mb-1">AI Language Partner</h3>
+                                <p class="text-gray-400">Conversation practice in different languages.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -105,20 +156,40 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div onclick="selectAssistant('poet_storyteller')" class="card-hover relative bg-gray-800 rounded-xl p-6 border border-transparent bg-gradient-to-br from-gray-800 to-gray-900 hover:border-blue-500/30 transition-all duration-300 cursor-pointer">
-                        <h3 class="text-xl font-semibold mb-2">AI Poet/Storyteller</h3>
-                        <p class="text-gray-400">Generates poems, stories, songs.</p>
+                        <div class="flex items-center gap-4">
+                            <img src="{% static 'img/AI Poet.png' %}" alt="AI Poet/Storyteller" class="w-20 h-20 object-cover rounded-lg ml-auto">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold mb-1">AI Poet/Storyteller</h3>
+                                <p class="text-gray-400">Generates poems, stories, songs.</p>
+                            </div>
+                        </div>
                     </div>
                     <div onclick="selectAssistant('designer')" class="card-hover relative bg-gray-800 rounded-xl p-6 border border-transparent bg-gradient-to-br from-gray-800 to-gray-900 hover:border-blue-500/30 transition-all duration-300 cursor-pointer">
-                        <h3 class="text-xl font-semibold mb-2">AI Designer</h3>
-                        <p class="text-gray-400">Poster ideas, color palettes, design tips.</p>
+                        <div class="flex items-center gap-4">
+                            <img src="{% static 'img/AI Designer.png' %}" alt="AI Designer" class="w-20 h-20 object-cover rounded-lg ml-auto">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold mb-1">AI Designer</h3>
+                                <p class="text-gray-400">Poster ideas, color palettes, design tips.</p>
+                            </div>
+                        </div>
                     </div>
                     <div onclick="selectAssistant('musician')" class="card-hover relative bg-gray-800 rounded-xl p-6 border border-transparent bg-gradient-to-br from-gray-800 to-gray-900 hover:border-blue-500/30 transition-all duration-300 cursor-pointer">
-                        <h3 class="text-xl font-semibold mb-2">AI Musician</h3>
-                        <p class="text-gray-400">Lyrics, melodies, music theory help.</p>
+                        <div class="flex items-center gap-4">
+                            <img src="{% static 'img/AI Musician.png' %}" alt="AI Musician" class="w-20 h-20 object-cover rounded-lg ml-auto">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold mb-1">AI Musician</h3>
+                                <p class="text-gray-400">Lyrics, melodies, music theory help.</p>
+                            </div>
+                        </div>
                     </div>
                     <div onclick="selectAssistant('game_master')" class="card-hover relative bg-gray-800 rounded-xl p-6 border border-transparent bg-gradient-to-br from-gray-800 to-gray-900 hover:border-blue-500/30 transition-all duration-300 cursor-pointer">
-                        <h3 class="text-xl font-semibold mb-2">AI Game Master</h3>
-                        <p class="text-gray-400">Runs role-playing adventures, text games.</p>
+                        <div class="flex items-center gap-4">
+                            <img src="{% static 'img/AI Game Master.png' %}" alt="AI Game Master" class="w-20 h-20 object-cover rounded-lg ml-auto">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold mb-1">AI Game Master</h3>
+                                <p class="text-gray-400">Runs role-playing adventures, text games.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
